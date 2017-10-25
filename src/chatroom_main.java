@@ -29,7 +29,6 @@ public class chatroom_main {
 		
 		String msg;
 		
-		System.out.println("");
 		
 	}
 	

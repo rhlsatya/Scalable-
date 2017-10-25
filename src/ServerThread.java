@@ -16,10 +16,12 @@ public class ServerThread extends Thread {
 		try
 		{
 			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			PrintWriter pr = new PrintWriter(socket.getOutputStream(), true );
 			String message = null;
 			while((message = br.readLine())!=null)
 			{
-				System.out.println("message from client:"+ message);
+				System.out.println(message);
+				pr.println("message recieved");
 			}
 			socket.close();
 			
