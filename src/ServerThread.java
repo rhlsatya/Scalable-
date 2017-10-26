@@ -6,7 +6,7 @@ public class ServerThread extends Thread {
 
 	Socket socket;
 	
-	ServerThread(Socket socket)
+	ServerThread(Socket socket, ServerThread[] threads)
 	{
 		this.socket = socket;
 	}
