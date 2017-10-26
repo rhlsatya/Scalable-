@@ -20,7 +20,8 @@ import java.io.*;
 		try
 		{
 			//is = new DataInputStream(socket.getInputStream());
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			//PrintWriter pr = new PrintWriter(socket.getOutputStream(), true );
 		    ps = new PrintStream(socket.getOutputStream());
 			ps.println("Enter your name:");
 			String name = br.readLine();
