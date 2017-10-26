@@ -13,13 +13,19 @@ public class chatroom_main {
 	{
 		chatr = new ServerSocket(port);
 		System.out.println("Server ready for connections..");
-		int i = 0;
+		
 		while(true)
 		{
 			
 			socket = chatr.accept();
-			(threads[i] = new ServerThread(socket, threads)).start();
-			i++;
+			for(int i = 0; i<100; i++)
+			{
+				if(threads[i] == null)
+				{
+					(threads[i] = new ServerThread(socket, threads)).start();
+					break;
+				}
+			}
 		}
 		
 	}
@@ -29,7 +35,7 @@ public class chatroom_main {
 		chatroom_main cm = new chatroom_main();
 		cm.runServer();
 		
-		String msg;
+		//String msg;
 		
 		
 	}

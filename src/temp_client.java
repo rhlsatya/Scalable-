@@ -12,10 +12,12 @@ public class temp_client
 			BufferedReader in = new BufferedReader(new InputStreamReader(client_s.getInputStream()));
 			while(true)
 			{
-				String s = br.readLine();
-				pr.println(name+": "+s);
+				//String s = br.readLine();
+				//pr.println(name+": "+s);
 				String st = in.readLine();
 				System.out.println(st);
+				String s = br.readLine();
+				pr.println(s);
 				//in.close();
 			}
 		}
