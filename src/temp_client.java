@@ -10,12 +10,15 @@ public class temp_client
 			Socket client_s = new Socket("localhost", 7899);
 			PrintWriter pr = new PrintWriter(client_s.getOutputStream(), true );
 			BufferedReader in = new BufferedReader(new InputStreamReader(client_s.getInputStream()));
+			String st = null;
 			while(true)
 			{
 				//String s = br.readLine();
 				//pr.println(name+": "+s);
-				String st = in.readLine();
+				while((st = in.readLine()).equals(null))
+				{
 				System.out.println(st);
+				}
 				String s = br.readLine();
 				pr.println(s);
 				//in.close();
