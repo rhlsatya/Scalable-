@@ -22,13 +22,17 @@ public class temp_client
 				pr.println(s);
 				
 				String st = in.readLine();
-				while(st.endsWith("\n"))
-				{
-					
-					st = st + in.readLine();
-				}
+				
+						
+				
+				
+				//st = st + in.readLine();
+				
 				System.out.println(st);
 				//in.close();
 			}
 		}
 }
+
+
+

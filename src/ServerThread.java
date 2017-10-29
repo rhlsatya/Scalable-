@@ -23,30 +23,37 @@ import java.io.*;
 	
 	public void join_chat(String msg)throws IOException
 	{
-		String chat_name = msg.substring(15, msg.indexOf("/n"));
+		String chat_name = msg.substring(15,(msg.indexOf("CLIENT_IP")-2));
 		String client_name = msg.substring(msg.lastIndexOf(32));
-		String reply = null;
+		//System.out.println("chat - "+chat_name+"\n"+"client - "+ client_name);
+		//System.out.println(msg.substring((msg.indexOf(chat_name)+chat_name.length()+2), (msg.indexOf(chat_name)+chat_name.length()+38)));
+		//String reply = null;
 		int flag = 1;
 		if(chat_name.equals(null))//check if chat room name is given 
 		{
+			//System.out.println("Condition 1");
 			flag = 0;
 		}
-		//check for the format of the message
-		else if(!msg.substring((msg.indexOf("/n")+2), (msg.indexOf("/n")+37)).equals("CLIENT_IP: 0\nPORT: 0\nCLIENT_NAME: "))
+		//check for the format of the message - KEEP AN EYE TO TEST - USING TWO \\???
+		else if(!((msg.substring((msg.indexOf(chat_name)+chat_name.length()+2), (msg.indexOf(chat_name)+chat_name.length()+37))).equals("CLIENT_IP: 0\\nPORT: 0\\nCLIENT_NAME:")))
 		{
+			//System.out.println("Condition 2");
 			flag = 0;
 		}
 		//confirm a client name
 		else if(client_name.equals(null))
 		{
+			//System.out.println("Condition 3");
 			flag = 0;
 		}
 		if(flag == 1)
 		{
+			//System.out.println("All satisfied");
 			for(int i = 0;i<100; i ++)
 			{
 				if(threads[i] != null)
 				{
+					System.out.println("chat joined");
 					threads[i].ps.println(client_name+" joined the chat");
 				}
 			}
@@ -60,7 +67,9 @@ import java.io.*;
 	
 	public void checkmsg(String msg) throws IOException
 	{
+		System.out.println("inside checkmsg");
 		ps = new PrintStream(socket.getOutputStream());
+		is = new DataInputStream(socket.getInputStream());
 		//String reply;
 		//String chat_name = msg.substring(15, msg.indexOf("/n"));
 		//String client_name = msg.substring(msg.lastIndexOf(32));
@@ -78,8 +87,9 @@ import java.io.*;
 		}
 		
 		
-		else if(msg.substring(0, 14).equals("JOIN_CHATROOM: "))//call the join function and let it handle everything
+		else if(msg.substring(0, 15).equals("JOIN_CHATROOM: "))//call the join function and let it handle everything
 		{
+			System.out.println("inside join");
 			join_chat(msg);
 		}
 		
@@ -95,13 +105,16 @@ import java.io.*;
 	{
 		try
 		{
-			//is = new DataInputStream(socket.getInputStream());
+			is = new DataInputStream(socket.getInputStream());
 			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			//PrintWriter pr = new PrintWriter(socket.getOutputStream(), true );
 		    ps = new PrintStream(socket.getOutputStream());
 			//ps.println("Enter your name:");
 			//String name = br.readLine();
-			String message = br.readLine();
+			
+		    String message = br.readLine();
+			System.out.println(message);
+			//System.out.println(message.substring(15,(message.indexOf("CLIENT_IP")-2)));
 			checkmsg(message);
 			/*for(int i = 0;i<100; i ++)
 			{
