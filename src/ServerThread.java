@@ -16,9 +16,20 @@ import java.io.*;
 		this.threads = threads;
 	}
 	
-	public void start_conversation()
+	public void start_conversation(String client_name) throws IOException
 	{
-		
+		String message;
+		while((message = br.readLine())!=null)
+		{
+			//System.out.println(message);
+			for(int i = 0;i<100; i ++)
+			{
+				if(threads[i] != null && threads[i] != this)
+				{
+					threads[i].ps.println(client_name+" : "+message);
+				}
+			}
+		}
 	}
 	
 	public void join_chat(String msg)throws IOException
@@ -48,6 +59,11 @@ import java.io.*;
 		}
 		if(flag == 1)
 		{
+			ps.println("JOINED_CHATROOM:"+ chat_name + "\n" + 
+					"SERVER_IP: \n" + 
+					"PORT: [port number of chat room]\n" + 
+					"ROOM_REF: \n" + 
+					"JOIN_ID: [integer that uniquely identifies client joining]");
 			//System.out.println("All satisfied");
 			for(int i = 0;i<100; i ++)
 			{
@@ -58,7 +74,7 @@ import java.io.*;
 				}
 			}
 			
-			start_conversation();
+			start_conversation(client_name);
 			//add_data(chat_name,client_name);
 			//send_msg(client_name + "has joined the chat");
 		}
@@ -89,7 +105,7 @@ import java.io.*;
 		
 		else if(msg.substring(0, 15).equals("JOIN_CHATROOM: "))//call the join function and let it handle everything
 		{
-			System.out.println("inside join");
+			//System.out.println("inside join");
 			join_chat(msg);
 		}
 		
