@@ -111,7 +111,9 @@ import java.io.*;
 		
 		else
 		{
-			
+			ps.println("Incorrect Protocol. Terminating Connection..");
+			socket.close();
+			Thread.currentThread().interrupt();
 		}	
 	}
 	
@@ -132,26 +134,7 @@ import java.io.*;
 			System.out.println(message);
 			//System.out.println(message.substring(15,(message.indexOf("CLIENT_IP")-2)));
 			checkmsg(message);
-			/*for(int i = 0;i<100; i ++)
-			{
-				if(threads[i] != null)
-				{
-					threads[i].ps.println(name+"joined the chat");
-				}
-			}*/
-			/*while((message = br.readLine())!=null)
-			{
-				//System.out.println(message);
-				for(int i = 0;i<100; i ++)
-				{
-					if(threads[i] != null && threads[i] != this)
-					{
-						threads[i].ps.println(name+" : "+message);
-					}
-				}
-				
-				
-			}*/
+			
 			socket.close();
 			
 		}
