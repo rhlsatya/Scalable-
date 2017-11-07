@@ -18,12 +18,19 @@ public class temp_client
 				
 				System.out.println("enter message");
 				
-				String s = br.readLine();
-				pr.println(s);
+				for(int i = 0; i< 10; i++)
+				{
+					int s = Integer.parseInt(br.readLine());
+					pr.println(s);
+				}
 				
-				String st = in.readLine();
-				
-						
+				String s = br.readLine(); 
+				pr.println(s); 
+				String st = null;
+				for(int i = 0; i< 10; i++)
+				{
+					 st = st +" " + in.readLine();//omit
+				}	
 				
 				
 				//st = st + in.readLine();

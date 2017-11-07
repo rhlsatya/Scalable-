@@ -9,8 +9,9 @@ public class chatroom_main {
 	public static final int port = 7899;
 	private static Socket socket;
 	private static ServerSocket chatr;
-	
-	
+	public volatile static int join_id[][] = new int[100][2];
+	public volatile static int chat_id[][] = new int[100][2];
+	int counter = 100;
 	
 	
 	
@@ -28,7 +29,9 @@ public class chatroom_main {
 			{
 				if(threads[i] == null)
 				{
-					(threads[i] = new ServerThread(socket, threads)).start();
+					//join_id[i][2] = counter;
+					counter++;
+					(threads[i] = new ServerThread(socket, threads, join_id, chat_id, port, counter)).start();
 					break;
 				}
 			}
