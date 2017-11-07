@@ -11,7 +11,8 @@ import java.io.*;
 	private int port;
 	private BufferedReader br;
 	public String client_name;
-	public volatile static int join_id[][] = new int[100][2];
+	public volatile static int join_id[][] = new int[100][100];
+	public volatile static int chat_id[][] = new int[100][100];
 	public int room_ref;
 	int counter; //to keep track of join id
 	ServerThread(Socket socket, ServerThread[] threads, int join_id[][], int chat_id[][], int port, int counter)
@@ -20,6 +21,7 @@ import java.io.*;
 		this.threads = threads;
 		this.port = port;
 		ServerThread.join_id = join_id;
+		ServerThread.chat_id = chat_id;
 		this. counter = counter;
 	}
 	
@@ -93,7 +95,7 @@ import java.io.*;
 		}
 		if(flag == 1)
 		{
-			 room_ref = create_room_ref(chat_name); // creates a unique room reference using ascii values
+			 room_ref = get_room_ref(chat_name); // creates a unique room reference using ascii values
 			ps.println("JOINED_CHATROOM:"+ chat_name + "\n" + 
 					"SERVER_IP:" + Inet4Address.getLocalHost().getHostAddress() + "\n" + 
 					"PORT: " + port + "\n" + 
@@ -101,8 +103,8 @@ import java.io.*;
 					"JOIN_ID: " + counter);
 			//System.out.println("All satisfied");
 			
-			assign_id();
-			 
+			assign_ids();
+			send_message(client_name + " joined the chat", room_ref);
 			for(int i = 0;i<100; i ++)
 			{
 				if(threads[i] != null && join_id[i][1] == room_ref)//if they're in the same chat room
@@ -120,8 +122,37 @@ import java.io.*;
 		//return reply;
 	}
 	
-	
-	public int create_room_ref(String chat_name)
+	public void send_message(String message, int ref)
+	{
+		
+		
+		
+		for(int i = 0;i<100; i ++)
+		{
+			if(chat_id[i][0] == ref) // get the room and then send everyone in that room a message
+			{
+				for(int j = 0; j < 100; j++)
+				{
+					if(chat_id[i][j] == 0)
+					{
+						break;
+					}
+					else
+					{
+						for(int k = 0; k<100; k++)
+						{
+							if(threads[k] != null && join_id[k][0] == chat_id[i][j]) 
+							{
+								threads[k].ps.println(message);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	public int get_room_ref(String chat_name)
 	{
 		int ref = 0;
 		
@@ -135,14 +166,49 @@ import java.io.*;
 		return ref;
 	}
 	
-	public void assign_id()
+	public void assign_ids()
 	{
-		for(int i = 0; i < 100; i++)
+		int flag = 0;
+		int i = 0;
+		while(chat_id[i][0] != 0 && i < 100)
+		{
+			if(chat_id[i][0] == room_ref)
+			{
+				for(int j = 1; j < 100; j++)
+				{
+					if(chat_id[i][j] == 0)
+					{
+						chat_id[i][j] = counter;
+						break;
+					}
+				}
+				flag++;
+				break;
+			}
+			i++;
+		}
+		if(flag == 0 && i<99)// in case the chatroom is new
+		{
+			chat_id[i][0] = room_ref;
+			chat_id[i][1] = counter;
+		}
+		
+		for(i = 0; i < 100; i++)
 		{
 			if(threads[i] == this)
 			{
+				//because the counter is local var 
+				//id is reassigned to the same value while the chatroom is added 
 				join_id[i][0] = counter;
-				join_id[i][1] = room_ref;
+				for(int j = 1; j<100; j++)
+				{
+					if(join_id[i][j] == 0)
+					{
+						join_id[i][j] = room_ref;
+						break;
+					}
+				}
+				//join_id[i][1] = room_ref;
 				break;
 			}
 		}

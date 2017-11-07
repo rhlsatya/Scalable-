@@ -9,9 +9,10 @@ public class chatroom_main {
 	public static final int port = 7899;
 	private static Socket socket;
 	private static ServerSocket chatr;
-	public volatile static int join_id[][] = new int[100][2];
-	public volatile static int chat_id[][] = new int[100][2];
+	public volatile static int join_id[][] = new int[100][100];
+	public volatile static int chat_id[][] = new int[100][100];
 	int counter = 100;
+	
 	
 	
 	
