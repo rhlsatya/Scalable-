@@ -74,42 +74,41 @@ import java.io.*;
 		
 		
 		String chat_name = msg.substring(15);
-		System.out.println(chat_name);
-		
-		
 		String msg1 = br.readLine();
-		System.out.println(msg1);
+		
 		String msg2 = br.readLine();
-		System.out.println(msg2);
+		
 		String msg3 = br.readLine();
-		System.out.println(msg3);
-		client_name = msg3.substring(14);
-		System.out.println(client_name);
 		
-		
+		client_name = msg3.substring(13);
 		
 		//System.out.println("chat - "+chat_name+"\n"+"client - "+ client_name);
 		//System.out.println(msg.substring((msg.indexOf(chat_name)+chat_name.length()+2), (msg.indexOf(chat_name)+chat_name.length()+38)));
 		//String reply = null;
-		int flag = 1;
+		int flag = 0;
 		if(chat_name.equals(null))//check if chat room name is given 
 		{
 			//System.out.println("Condition 1");
-			flag = 0;
+			flag++;
 		}
 		//check for the format of the message - KEEP AN EYE TO TEST - USING TWO \\???
-		else if(!((msg.substring((msg.indexOf(chat_name)+chat_name.length()+2), (msg.indexOf(chat_name)+chat_name.length()+37))).equals("CLIENT_IP: 0\\nPORT: 0\\nCLIENT_NAME:")))
+		else if(!msg1.equals("CLIENT_IP: 0") && !msg2.equals("PORT: 0"))
 		{
-			//System.out.println("Condition 2");
-			flag = 0;
+			flag++;
 		}
+		
+		
 		//confirm a client name
 		else if(client_name.equals(null))
 		{
 			//System.out.println("Condition 3");
-			flag = 0;
+			flag++;
 		}
-		if(flag == 1)
+		else if(!msg1.equals("CLIENT_NAME: "+client_name))
+		{
+			flag++;
+		}
+		if(flag == 0)
 		{
 			 room_ref = get_room_ref(chat_name); // creates a unique room reference using ascii values
 			ps.println("JOINED_CHATROOM:"+ chat_name + "\n" + 
@@ -121,7 +120,7 @@ import java.io.*;
 			
 			assign_ids();
 			send_message(client_name + " joined the chat", room_ref);
-			start_conversation();
+			//start_conversation();
 			
 			//add_data(chat_name,client_name);
 			//send_msg(client_name + "has joined the chat");
