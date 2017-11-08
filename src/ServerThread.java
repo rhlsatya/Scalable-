@@ -70,8 +70,24 @@ import java.io.*;
 	
 	public void join_chat(String msg)throws IOException
 	{
-		String chat_name = msg.substring(15,(msg.indexOf("CLIENT_IP")-2));
-		client_name = msg.substring(msg.lastIndexOf(32));
+		
+		
+		
+		String chat_name = msg.substring(15);
+		System.out.println(chat_name);
+		
+		
+		String msg1 = br.readLine();
+		System.out.println(msg1);
+		String msg2 = br.readLine();
+		System.out.println(msg2);
+		String msg3 = br.readLine();
+		System.out.println(msg3);
+		client_name = msg3.substring(14);
+		System.out.println(client_name);
+		
+		
+		
 		//System.out.println("chat - "+chat_name+"\n"+"client - "+ client_name);
 		//System.out.println(msg.substring((msg.indexOf(chat_name)+chat_name.length()+2), (msg.indexOf(chat_name)+chat_name.length()+38)));
 		//String reply = null;
@@ -105,15 +121,6 @@ import java.io.*;
 			
 			assign_ids();
 			send_message(client_name + " joined the chat", room_ref);
-			for(int i = 0;i<100; i ++)
-			{
-				if(threads[i] != null && join_id[i][1] == room_ref)//if they're in the same chat room
-				{
-					System.out.println("chat joined");
-					threads[i].ps.println(client_name+" joined the chat");
-				}
-			}
-			
 			start_conversation();
 			
 			//add_data(chat_name,client_name);
@@ -141,7 +148,7 @@ import java.io.*;
 					{
 						for(int k = 0; k<100; k++)
 						{
-							if(threads[k] != null && join_id[k][0] == chat_id[i][j]) 
+							if(threads[k] != null && join_id[k][0] == chat_id[i][j] && threads[k] != this) 
 							{
 								threads[k].ps.println(message);
 								break;
@@ -149,6 +156,7 @@ import java.io.*;
 						}
 					}
 				}
+				break;
 			}
 		}
 	}
@@ -236,11 +244,13 @@ import java.io.*;
 		}
 		
 		
-		else if(msg.substring(0, 15).equals("JOIN_CHATROOM: "))//call the join function and let it handle everything
+		else if(msg.startsWith("JOIN_CHATROOM: "))//call the join function and let it handle everything
 		{
 			//System.out.println("inside join");
 			join_chat(msg);
 		}
+		
+		
 		
 		else
 		{
@@ -257,7 +267,7 @@ import java.io.*;
 		try
 		{
 			is = new DataInputStream(socket.getInputStream());
-			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			//PrintWriter pr = new PrintWriter(socket.getOutputStream(), true );
 		    ps = new PrintStream(socket.getOutputStream());
 			//ps.println("Enter your name:");

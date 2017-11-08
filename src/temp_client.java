@@ -11,33 +11,31 @@ public class temp_client
 			Socket client_s = new Socket("localhost", 7899);
 			PrintWriter pr = new PrintWriter(client_s.getOutputStream(), true );
 			BufferedReader in = new BufferedReader(new InputStreamReader(client_s.getInputStream()));
-			while(true)
-			{
+			//while(true)
+			//{
 				//String s = br.readLine();
 				//pr.println(name+": "+s);
 				
 				System.out.println("enter message");
 				
-				for(int i = 0; i< 10; i++)
-				{
-					int s = Integer.parseInt(br.readLine());
-					pr.println(s);
-				}
 				
-				String s = br.readLine(); 
+				String s = "JOIN_CHATROOM: chat1\n" + 
+						"CLIENT_IP: 0\n" + 
+						"PORT: 0\n" + 
+						"CLIENT_NAME: rahul"; 
+				System.out.println(s);
 				pr.println(s); 
-				String st = null;
-				for(int i = 0; i< 10; i++)
-				{
-					 st = st +" " + in.readLine();//omit
-				}	
+				
+				
+				//String st = in.readLine();
+				
 				
 				
 				//st = st + in.readLine();
 				
-				System.out.println(st);
+				//System.out.println(st);
 				//in.close();
-			}
+			//}
 		}
 }
 
