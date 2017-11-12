@@ -24,7 +24,7 @@ import java.io.*;
 		ServerThread.chat_id = chat_id;
 		this. counter = counter;
 	}
-	
+	/*
 	public void start_conversation() throws IOException
 	{
 		String message;
@@ -66,7 +66,7 @@ import java.io.*;
 		Thread.currentThread().interrupt();
 		return;
 		
-	}
+	}*/
 	
 	public void join_chat(String msg)throws IOException
 	{
@@ -74,13 +74,13 @@ import java.io.*;
 		
 		
 		String chat_name = msg.substring(15);
-		String msg1 = br.readLine();
+		String client_ip = br.readLine();
 		
-		String msg2 = br.readLine();
+		String port_no = br.readLine();
 		
-		String msg3 = br.readLine();
+		String name = br.readLine();
 		
-		client_name = msg3.substring(13);
+		client_name = name.substring(13);
 		
 		//System.out.println("chat - "+chat_name+"\n"+"client - "+ client_name);
 		//System.out.println(msg.substring((msg.indexOf(chat_name)+chat_name.length()+2), (msg.indexOf(chat_name)+chat_name.length()+38)));
@@ -92,7 +92,7 @@ import java.io.*;
 			flag++;
 		}
 		//check for the format of the message - KEEP AN EYE TO TEST - USING TWO \\???
-		else if(!msg1.equals("CLIENT_IP: 0") && !msg2.equals("PORT: 0"))
+		else if(!client_ip.equals("CLIENT_IP: 0") && !port_no.equals("PORT: 0"))
 		{
 			flag++;
 		}
@@ -104,13 +104,13 @@ import java.io.*;
 			//System.out.println("Condition 3");
 			flag++;
 		}
-		else if(!msg1.equals("CLIENT_NAME: "+client_name))
+		else if(!name.equals("CLIENT_NAME: "+client_name))
 		{
 			flag++;
 		}
 		if(flag == 0)
 		{
-			 room_ref = get_room_ref(chat_name); // creates a unique room reference using ascii values
+			room_ref = get_room_ref(chat_name); // creates a unique room reference using ascii values
 			ps.println("JOINED_CHATROOM:"+ chat_name + "\n" + 
 					"SERVER_IP:" + Inet4Address.getLocalHost().getHostAddress() + "\n" + 
 					"PORT: " + port + "\n" + 
@@ -119,7 +119,7 @@ import java.io.*;
 			//System.out.println("All satisfied");
 			
 			assign_ids();
-			send_message(client_name + " joined the chat", room_ref);
+			broadcast_message(client_name + " joined the chat", room_ref);
 			//start_conversation();
 			
 			//add_data(chat_name,client_name);
@@ -128,7 +128,68 @@ import java.io.*;
 		//return reply;
 	}
 	
-	public void send_message(String message, int ref)
+	public void leave_chat(String msg)
+	{
+		
+	}
+	
+	public void send_message(String msg) throws IOException
+	{
+		int ref = Integer.parseInt(msg.substring(6));
+		String join = br.readLine();
+		int join_ids = Integer.parseInt(join.substring(9));
+		String name = br.readLine();
+		String clnt_name = name.substring(13);
+		String mesg = br.readLine();
+		String message = mesg.substring(9);//have to work on string terminated with /n/n
+		
+		//System.out.println("chat - "+chat_name+"\n"+"client - "+ client_name);
+		//System.out.println(msg.substring((msg.indexOf(chat_name)+chat_name.length()+2), (msg.indexOf(chat_name)+chat_name.length()+38)));
+		//String reply = null;
+		int flag = 0;
+		if(join_ids != counter || !clnt_name.equals(client_name) || message.equals(null))//check if chat room name is given 
+		{
+			//System.out.println("Condition 1");
+			flag++;
+		}
+		
+		else if(!join.equals("JOIN_ID: " + counter) && !name.equals("CLIENT_NAME: " + clnt_name) && !mesg.equals("MESSAGE: " + message))
+		{
+			flag++;
+		}
+		int flag2 = 0;
+		
+		for(int i = 0;i<100; i ++)
+		{
+			if(join_id[i][0] == join_ids) 
+			{
+				for(int j = 1; j < 100; j++)
+				{
+					if(join_id[i][j] == 0)
+					{
+						break;
+					}
+					else if(join_id[i][j] == ref)
+					{
+						flag2++;
+					}					
+				}
+				break;
+			}
+		}
+		if(flag == 0 && flag2 > 0)
+		{
+			broadcast_message(message, ref);
+			ps.println("CHAT: " + ref + "\n" + 
+					"CLIENT_NAME: " + clnt_name + "\n" + 
+					"MESSAGE: " + mesg + "\n\n");
+		}
+		//check for the format of the message - KEEP AN EYE TO TEST - USING TWO \\???
+		//confirm a client name
+		
+	}
+	
+	public void broadcast_message(String message, int ref)
 	{
 		
 		
@@ -249,13 +310,21 @@ import java.io.*;
 			join_chat(msg);
 		}
 		
+		else if(msg.startsWith("CHAT: "))//call the send message function and let it handle everything
+		{
+			//System.out.println("inside join");
+			send_message(msg);
+		}
 		
+		else if(msg.startsWith("LEAVE_CHATROOM: "))//call the leave function and let it handle everything
+		{
+			//System.out.println("inside join");
+			leave_chat(msg);
+		}
 		
 		else
 		{
-			ps.println("Incorrect Protocol. Terminating Connection..");
-			socket.close();
-			Thread.currentThread().interrupt();
+			ps.println("Incorrect Protocol. Try again");
 		}	
 	}
 	
