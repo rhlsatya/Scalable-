@@ -68,11 +68,8 @@ import java.io.*;
 		
 	}*/
 	
-	public void join_chat(String msg)throws IOException
-	{
-		
-		
-		
+	public void join_chat(String msg)throws IOException // add the else conditions to all of them
+	{	
 		String chat_name = msg.substring(15);
 		String client_ip = br.readLine();
 		
@@ -128,8 +125,56 @@ import java.io.*;
 		//return reply;
 	}
 	
-	public void leave_chat(String msg)
+	public void leave_chat(String msg) throws IOException
 	{
+		int ref = Integer.parseInt(msg.substring(17));
+		String join = br.readLine();
+		int join_ids = Integer.parseInt(join.substring(10));
+		String name = br.readLine();
+		String clnt_name = name.substring(13);
+		
+		
+		//System.out.println("chat - "+chat_name+"\n"+"client - "+ client_name);
+		//System.out.println(msg.substring((msg.indexOf(chat_name)+chat_name.length()+2), (msg.indexOf(chat_name)+chat_name.length()+38)));
+		//String reply = null;
+		int flag = 0;
+		if(join_ids != counter || !clnt_name.equals(client_name))//check if chat room name is given 
+		{
+			//System.out.println("Condition 1");
+			flag++;
+		}
+		
+		else if(!join.equals("JOIN_ID: " + counter) && !name.equals("CLIENT_NAME: " + clnt_name))
+		{
+			flag++;
+		}
+		int flag2 = 0;
+		
+		for(int i = 0;i<100; i ++)
+		{
+			if(join_id[i][0] == join_ids) 
+			{
+				for(int j = 1; j < 100; j++)
+				{
+					if(join_id[i][j] == 0)
+					{
+						break;
+					}
+					else if(join_id[i][j] == ref)
+					{
+						flag2++;
+					}					
+				}
+				break;
+			}
+		}
+		if(flag == 0 && flag2 > 0)
+		{
+			broadcast_message(client_name + " left the room", ref);
+			ps.println("LEFT_CHATROOM:" + ref + "\n" + 
+					"JOIN_ID: " + join_ids);
+			remove_ids(ref);
+		}
 		
 	}
 	
@@ -137,7 +182,7 @@ import java.io.*;
 	{
 		int ref = Integer.parseInt(msg.substring(6));
 		String join = br.readLine();
-		int join_ids = Integer.parseInt(join.substring(9));
+		int join_ids = Integer.parseInt(join.substring(10));
 		String name = br.readLine();
 		String clnt_name = name.substring(13);
 		String mesg = br.readLine();
@@ -233,7 +278,75 @@ import java.io.*;
 		
 		return ref;
 	}
-	
+	public void remove_ids(int ref)
+	{
+		
+		int i = 0;
+		while(chat_id[i][0] != 0 && i < 100)
+		{
+			if(chat_id[i][0] == room_ref)
+			{
+				for(int j = 1; j < 100; j++)
+				{
+					if(chat_id[i][j] == counter)
+					{
+						for(int k = j; k < 100; k++)
+						{
+							if(k < 99)
+							{
+								chat_id[i][k] = chat_id[i][k+1];
+								if(chat_id[i][k+1] == 0)
+								{
+									break;
+								}
+							}
+							else 
+							{
+								chat_id[i][k] = 0;
+							}
+						}
+						break;
+					}
+
+				}
+				break;
+			}
+			i++;
+		}
+			
+		
+		for(i = 0; i < 100; i++)
+		{
+			if(join_id[i][0] == counter)
+			{
+				
+				for(int j = 1; j<100; j++)
+				{
+					if(join_id[i][j] == ref)
+					{
+						for(int k = j; k < 100; k++)
+						{
+							if(k < 99)
+							{
+								chat_id[i][k] = chat_id[i][k+1];
+								if(chat_id[i][k+1] == 0)
+								{
+									break;
+								}
+							}
+							else 
+							{
+								chat_id[i][k] = 0;
+							}
+						}
+						break;
+					}
+				
+				}
+				break;
+			}
+		}
+	}
 	public void assign_ids()
 	{
 		int flag = 0;
