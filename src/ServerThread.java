@@ -125,6 +125,34 @@ import java.io.*;
 		//return reply;
 	}
 	
+	public void kill_service()
+	{
+		for(int i = 0; i < 100; i++)
+		{
+			if(join_id[i][0] == counter)
+			{
+				
+				for(int j = 1; j<100; j++)
+				{
+					if(join_id[i][j] == 0)
+					{
+						break;
+					}
+					else
+					{
+						remove_ids(join_id[i][j]);
+						broadcast_message(client_name + " left the room", join_id[i][j]);
+					}
+				}
+				
+				
+				break;
+			}
+		}
+		
+	}
+	
+	
 	public void leave_chat(String msg) throws IOException
 	{
 		int ref = Integer.parseInt(msg.substring(17));
@@ -405,8 +433,8 @@ import java.io.*;
 		//String client_name = msg.substring(msg.lastIndexOf(32));
 		if(msg.equals("KILL_SERVICE"))//close down the program
 		{
-			System.out.println("Killing service");
 			ps.println("Killing Service");
+			kill_service();
 			socket.close();
 			Thread.currentThread().interrupt();
 			return;
