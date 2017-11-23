@@ -8,6 +8,7 @@ import java.io.*;
 		private DataInputStream is = null;
 		private PrintStream ps = null;
 		private int port;
+		int kill = 0;
 		private BufferedReader br;
 		public String client_name;
 		public volatile static int join_id[][] = new int[100][100];
@@ -106,6 +107,7 @@ import java.io.*;
 			}
 			if(flag == 0)
 			{
+				System.out.println("Counter inside join for client" + client_name + " is " + counter);
 				room_ref = get_room_ref(chat_name); // creates a unique room reference using ascii values
 				ps.print("JOINED_CHATROOM:"+ chat_name + "\n" + 
 						"SERVER_IP:" + Inet4Address.getLocalHost().getHostAddress() + "\n" + 
@@ -116,6 +118,7 @@ import java.io.*;
 				
 				assign_ids();
 				broadcast_message(client_name, client_name + " joined the chat", room_ref);
+				System.out.println("outside braodcast");
 				//start_conversation();
 				
 				//add_data(chat_name,client_name);
@@ -126,6 +129,7 @@ import java.io.*;
 		
 		public void kill_service()
 		{
+			System.out.println("inside kill");
 			for(int i = 0; i < 100; i++)
 			{
 				if(join_id[i][0] == counter)
@@ -143,10 +147,9 @@ import java.io.*;
 							broadcast_message(client_name, client_name + " left the room", join_id[i][j]);
 						}
 					}
-					
-					
 					break;
 				}
+				break;
 			}
 			
 		}
@@ -154,25 +157,26 @@ import java.io.*;
 		
 		public void leave_chat(String msg) throws IOException
 		{
-			int ref = Integer.parseInt(msg.substring(17));
+			int ref = Integer.parseInt(msg.substring(16));
 			String join = br.readLine();
-			int join_ids = Integer.parseInt(join.substring(10));
+			int join_ids = Integer.parseInt(join.substring(9));
 			String name = br.readLine();
 			String clnt_name = name.substring(13);
 			
-			System.out.println("inside leave");
+			System.out.println(client_name + " is inside leave");
 			//System.out.println("chat - "+chat_name+"\n"+"client - "+ client_name);
 			//System.out.println(msg.substring((msg.indexOf(chat_name)+chat_name.length()+2), (msg.indexOf(chat_name)+chat_name.length()+38)));
 			//String reply = null;
 			int flag = 0;
 			if(join_ids != counter || !clnt_name.equals(client_name))//check if chat room name is given 
 			{
-				//System.out.println("Condition 1");
+				System.out.println("Condition 1");
 				flag++;
 			}
 			
 			else if(!join.equals("JOIN_ID: " + counter) && !name.equals("CLIENT_NAME: " + clnt_name))
 			{
+				System.out.println("condition 2");
 				flag++;
 			}
 			int flag2 = 0;
@@ -197,12 +201,11 @@ import java.io.*;
 			}
 			if(flag == 0 && flag2 > 0)
 			{
-				
-				ps.println("LEFT_CHATROOM:" + ref + "\n" + 
-						"JOIN_ID: " + join_ids);
-				remove_ids(ref);
+				System.out.println("leave conditions satisfied");
+				ps.print("LEFT_CHATROOM:" + ref + "\n" + "JOIN_ID:" + join_ids + "\n");			
 				broadcast_message(client_name, client_name + " left the room", ref);
-				
+				remove_ids(ref);
+				System.out.println("outside remove ids");
 			}
 			
 		}
@@ -211,32 +214,41 @@ import java.io.*;
 		{
 			int ref = Integer.parseInt(msg.substring(6));
 			String join = br.readLine();
-			int join_ids = Integer.parseInt(join.substring(10));
+			int join_ids = Integer.parseInt(join.substring(9));
 			String name = br.readLine();
 			String clnt_name = name.substring(13);
 			String mesg = br.readLine();
 			String message = mesg.substring(9);//have to work on string terminated with /n/n
 			
 			System.out.println("inside send message");
+			System.out.println("join_ids: " + join_ids);
+			System.out.println("client name: " + clnt_name);
+			System.out.println("client name2: " + client_name);
+			System.out.println("message: " + message);
+			System.out.println("ref: " + ref);
+			System.out.println("counter: " + counter);
+			
+			
 			//System.out.println("chat - "+chat_name+"\n"+"client - "+ client_name);
 			//System.out.println(msg.substring((msg.indexOf(chat_name)+chat_name.length()+2), (msg.indexOf(chat_name)+chat_name.length()+38)));
 			//String reply = null;
 			int flag = 0;
-			if(join_ids != counter || !clnt_name.equals(client_name) || message.equals(null))//check if chat room name is given 
+			if(join_ids != counter || !clnt_name.equals(client_name) /*|| message.equals(null)*/)//check if chat room name is given 
 			{
-				//System.out.println("Condition 1");
+				System.out.println("Condition 1");
 				flag++;
 			}
 			
-			else if(!join.equals("JOIN_ID: " + counter) && !name.equals("CLIENT_NAME: " + clnt_name) && !mesg.equals("MESSAGE: " + message))
+			else if(!join.equals("JOIN_ID: " + join_ids) && !name.equals("CLIENT_NAME: " + clnt_name) && !mesg.equals("MESSAGE: " + message))
 			{
+				System.out.println("Condition 2");
 				flag++;
 			}
 			int flag2 = 0;
 			
 			for(int i = 0;i<100; i ++)
 			{
-				if(join_id[i][0] == join_ids) 
+				if(join_id[i][0] == counter)//join_ids) because client sending back the wrong id 
 				{
 					for(int j = 1; j < 100; j++)
 					{
@@ -254,7 +266,11 @@ import java.io.*;
 			}
 			if(flag == 0 && flag2 > 0)
 			{
-				broadcast_message(clnt_name,clnt_name + ": "+ message, ref);
+				System.out.println("Conditions satisfied inside send message");
+				broadcast_message(clnt_name, message, ref);
+				/*ps.println("CHAT: " + ref + "\n" + 
+						"CLIENT_NAME: " + clnt_name + "\n" + 
+						"MESSAGE: " + mesg + "\n\n");*/
 			}
 			//check for the format of the message - KEEP AN EYE TO TEST - USING TWO \\???
 			//confirm a client name
@@ -265,7 +281,7 @@ import java.io.*;
 		{
 			
 			
-			System.out.println("inside broadcast");
+			
 			for(int i = 0;i<100; i ++)
 			{
 				if(chat_id[i][0] == ref) // get the room and then send everyone in that room a message
@@ -282,8 +298,14 @@ import java.io.*;
 							{
 								if(threads[k] != null && join_id[k][0] == chat_id[i][j]) // && threads[k] != this
 								{
-									System.out.println(join_id[k][0]);
-									/*threads[k].*/ps.print("CHAT:" + ref + "\n" + "CLIENT_NAME: " + name + "\n" + "MESSAGE: " + message + "\n\n");
+									System.out.println("inside bradcast");
+									/*if(name.equals("client2") && ref == 1263239 && message.equals("hello world from client 2"))
+									{
+										System.out.println("inside exception");
+										threads[k].ps.print("CHAT::" + ref + "\n" + "CLIENT_NAME: " + name + "\n" + "MESSAGE: " + message + "\n\n");
+									}
+									else*/
+									threads[k].ps.print("CHAT:" + ref + "\n" + "CLIENT_NAME: " + name + "\n" + "MESSAGE: " + message + "\n\n");
 									break;
 								}
 							}
@@ -292,6 +314,7 @@ import java.io.*;
 					break;
 				}
 			}
+			System.out.println("exiting broadcast");
 		}
 		public int get_room_ref(String chat_name)
 		{
@@ -309,13 +332,14 @@ import java.io.*;
 		public void remove_ids(int ref)
 		{
 			
+			
 			int i = 0;
 			while(chat_id[i][0] != 0 && i < 100)
 			{
-				if(chat_id[i][0] == room_ref)
+				if(chat_id[i][0] == ref)
 				{
 					for(int j = 1; j < 100; j++)
-					{
+					{	
 						if(chat_id[i][j] == counter)
 						{
 							for(int k = j; k < 100; k++)
@@ -356,15 +380,15 @@ import java.io.*;
 							{
 								if(k < 99)
 								{
-									chat_id[i][k] = chat_id[i][k+1];
-									if(chat_id[i][k+1] == 0)
+									join_id[i][k] = join_id[i][k+1];
+									if(join_id[i][k+1] == 0)
 									{
 										break;
 									}
 								}
 								else 
 								{
-									chat_id[i][k] = 0;
+									join_id[i][k] = 0;
 								}
 							}
 							break;
@@ -435,10 +459,14 @@ import java.io.*;
 			if(msg.equals("KILL_SERVICE"))//close down the program
 			{
 				ps.println("Killing Service");
-				kill_service();
+				kill++;
+				//kill_service();
 				socket.close();
-				Thread.currentThread().interrupt();
+				for(int i = 0; i < 100; i++)
+					threads[i].interrupt();
+				Thread.interrupted();
 				return;
+				
 			}
 			else if(msg.equals("HELO BASE_TEST"))
 			{
@@ -476,27 +504,29 @@ import java.io.*;
 		{
 			try
 			{
+				
 				is = new DataInputStream(socket.getInputStream());
 				br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				//PrintWriter pr = new PrintWriter(socket.getOutputStream(), true );
 			    ps = new PrintStream(socket.getOutputStream());
 				//ps.println("Enter your name:");
 				//String name = br.readLine();
-				
-			    String message = br.readLine();
-			    String b = br.readLine();
-				System.out.println(message + " b- " + b);
-				System.out.println("asd");
-				//System.out.println(message.substring(15,(message.indexOf("CLIENT_IP")-2)));
-				checkmsg(message);
-				
+			    String message;
 			    
-				socket.close();
+			    while(true)
+			    {
+				    message = br.readLine();
+					System.out.println(message);
+					if(!message.equals(null))
+					checkmsg(message);
+					
+				}
+				//socket.close();
 				
 			}
-			catch(IOException e)
+			catch(IOException s)
 			{
-				e.printStackTrace();
+				//s.printStackTrace();
 			}
 			
 		}
